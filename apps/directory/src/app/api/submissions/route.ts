@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { init as initAdmin } from "@instantdb/admin";
-import { id as generateId } from "@instantdb/admin";
-import { submissionSchema } from "shared";
+import { init as initAdmin, id as generateId } from "@instantdb/admin";
+import { z } from "zod";
 import { schema } from "db";
 import { inngest } from "@/inngest/client";
 
@@ -12,6 +11,11 @@ function getAdminDb() {
     schema,
   });
 }
+
+const submissionSchema = z.object({
+  projectId: z.string().min(1),
+  data: z.record(z.unknown()),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,24 +36,39 @@ export async function POST(request: NextRequest) {
 
     const { projectId, data } = parsed.data;
     const db = getAdminDb();
-    const submissionId = generateId();
+    const entryId = generateId();
+
+    const title =
+      (data.name as string) ||
+      (data.title as string) ||
+      `Submission ${entryId.slice(0, 6)}`;
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
     await db.transact([
-      db.tx.submissions[submissionId].update({
+      db.tx.entries[entryId].update({
         projectId,
-        data,
+        title,
+        slug,
+        content: JSON.stringify(data, null, 2),
         status: "pending",
+        metadata: data,
         createdAt: Date.now(),
       }),
     ]);
 
-    // Fire Inngest event for notification
-    await inngest.send({
-      name: "submission/received",
-      data: { projectId, submissionId, data },
-    });
+    try {
+      await inngest.send({
+        name: "entry/received",
+        data: { projectId, entryId, data },
+      });
+    } catch (inngestErr) {
+      console.warn("[submissions] inngest.send failed (non-fatal):", inngestErr);
+    }
 
-    return NextResponse.json({ ok: true, id: submissionId });
+    return NextResponse.json({ ok: true, id: entryId });
   } catch (err) {
     console.error("[submissions] POST error", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
