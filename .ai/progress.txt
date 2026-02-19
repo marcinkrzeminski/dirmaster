@@ -1,0 +1,72 @@
+## Session 1 — Full monorepo implementation
+
+### Tasks completed: 1-23 (all except e2e tests #24)
+
+#### Task 1: Monorepo setup
+- Turborepo + pnpm workspaces configured
+- apps/hq (port 3000), apps/directory (port 3001)
+- Shared tsconfig.base.json, eslint.config.base.mjs, .prettierrc
+- .gitignore, turbo.json with build/dev/lint/test pipelines
+- Files: package.json, pnpm-workspace.yaml, turbo.json, tsconfig.base.json
+
+#### Task 2-4: Shared packages
+- packages/shared: Zod schemas, TypeScript types (Entry, Project, Submission, ThemeConfig), utils (slugify, formatDate, cn)
+- packages/db: InstantDB schema (owners, projects, entries, submissions + links), React client (init), admin client
+- packages/cache: Upstash Redis helpers (getRedis, CACHE_TTL=3600), cache keys (dm: prefix), read/write/invalidate functions
+- packages/ui: Button, Input, Textarea, Label, Card, Badge, Dialog, Select, Tabs, Toast, Switch (Radix UI + Tailwind)
+
+Key decisions:
+- InstantDB v0.22.x (was 0.17/0.3 in initial spec, updated to latest)
+- `noImplicitAny: false` in HQ/Directory tsconfig (InstantDB query results typed as unknown)
+- @types/node added to packages/db and packages/cache
+
+#### Tasks 5-11: HQ app
+- /login: GitHub + Google OAuth via `db.auth.createAuthorizationURL()` (v0.22 API)
+- middleware.ts: cookie-based auth check for /dashboard/* routes
+- AuthGuard.tsx: client-side protection with redirect
+- DashboardNav.tsx: sidebar with Overview, Projects nav items + logout
+- /dashboard: projects grid with entry/submission counts + CTAs
+- /dashboard/projects: projects list with actions
+- /dashboard/projects/new: create form with auto-slug from name
+- /dashboard/projects/[id]/entries: entries list with status filter + publish toggle + delete + cache invalidation
+- /dashboard/projects/[id]/entries/new: entry creation form
+- /dashboard/projects/[id]/entries/[entryId]: entry edit form
+- /dashboard/projects/[id]/submissions: submissions list with approve/reject actions
+- /dashboard/projects/[id]/settings: General, Theme, SEO, Danger tabs
+- EntryForm.tsx: shared form component with Textarea (not rich text editor, per user preference for simplest)
+
+#### Tasks 12-20: Directory app
+- src/lib/data.ts: Redis-first data fetching (getProject, getPublishedEntries, getEntryBySlug) with InstantDB admin fallback
+- src/lib/theme.ts: buildThemeCss() generates CSS variables from ThemeConfig
+- layout.tsx: SSR metadata + CSS variables injection in <head>
+- MinimalTemplate, BoldTemplate, ClassicTemplate: 3 visual themes
+- / (home): template selection based on project.settings.theme
+- /[slug]: SSR entry page with OG tags, Twitter cards, JSON-LD structured data
+- /submit: dynamic form based on project.settings.submissionForm (default: name, url, description, email)
+- SubmissionForm.tsx: client-side form with honeypot spam prevention
+- /api/submissions/route.ts: POST handler, saves to InstantDB, fires Inngest event
+- sitemap.ts, robots.ts: SEO files
+
+#### Task 21: Inngest
+- apps/hq/src/inngest/: client.ts + functions.ts (onEntryPublished, onSubmissionReceived)
+- apps/hq/src/app/api/inngest/route.ts: serve endpoint
+- apps/directory/src/inngest/client.ts
+- apps/directory/src/app/api/inngest/route.ts
+- Email via Plunk API (PLUNK_API_KEY env)
+
+#### Tasks 22-23: Deployment + Docs
+- apps/hq/Dockerfile, apps/directory/Dockerfile (multi-stage, standalone output)
+- docker-compose.yml
+- next.config.ts: output: "standalone" in both apps
+- README.md: full setup guide, env vars table, Vercel + Docker deployment, troubleshooting
+
+#### Feedback loops
+- pnpm install: ✅ passes
+- pnpm --filter hq typecheck: ✅ passes
+- pnpm --filter directory typecheck: ✅ passes
+- pnpm --filter shared typecheck: ✅ passes
+- pnpm --filter db typecheck: ✅ passes
+- pnpm --filter cache typecheck: ✅ passes
+- pnpm --filter ui typecheck: ✅ passes
+
+#### Remaining: Task 24 (e2e Playwright tests) — not implemented, set passes: false

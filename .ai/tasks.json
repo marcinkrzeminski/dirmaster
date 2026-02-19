@@ -9,7 +9,7 @@
       "Configure shared tsconfig and eslint",
       "Add .env.example files for both apps"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "setup",
@@ -21,7 +21,7 @@
       "Configure package.json exports for each package",
       "Verify packages are importable from apps"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "database",
@@ -35,7 +35,7 @@
       "Setup relations: owner hasMany projects, project hasMany entries/submissions",
       "Export typed client from packages/db"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "database",
@@ -49,7 +49,7 @@
       "Add TTL configuration (e.g., 1 hour default)",
       "Export all helpers from packages/cache"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-auth",
@@ -62,7 +62,7 @@
       "Create useCurrentUser hook",
       "Protect all /dashboard/* routes"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-dashboard",
@@ -75,7 +75,7 @@
       "Add quick actions: view project, manage entries",
       "Add 'Create new project' CTA button"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-projects",
@@ -89,7 +89,7 @@
       "Implement project delete with confirmation",
       "Add domain validation (unique per owner)"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-entries",
@@ -104,7 +104,7 @@
       "Add image upload via InstantDB Storage",
       "Implement publish/unpublish toggle"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-entries",
@@ -116,7 +116,7 @@
       "After entry publish/unpublish: update Redis accordingly",
       "Add Inngest job for async cache warming if needed"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-submissions",
@@ -130,7 +130,7 @@
       "Add bulk actions for multiple submissions",
       "Setup Inngest job for email notification on new submission"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "hq-settings",
@@ -144,7 +144,7 @@
       "Add integration settings: webhook URL for new submissions",
       "Save settings to InstantDB and invalidate Redis"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-core",
@@ -157,7 +157,7 @@
       "Create getProject helper: Redis first, InstantDB fallback",
       "Create getEntries helper: Redis first, InstantDB fallback"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-pages",
@@ -173,7 +173,7 @@
       "Create sitemap.xml generation",
       "Create robots.txt"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-submission",
@@ -188,7 +188,7 @@
       "Show success message with expectations",
       "Add honeypot/captcha for spam prevention"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-seo",
@@ -202,7 +202,7 @@
       "Add canonical URLs",
       "Verify SSR renders complete HTML for crawlers"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-theming",
@@ -215,7 +215,7 @@
       "Implement theme selection in HQ project settings",
       "Store selected template + overrides in project.settings.theme"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-theming",
@@ -228,7 +228,7 @@
       "Define color palette: neutral grays, single accent color",
       "Default fonts: Inter for body, optional serif for headings"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-theming",
@@ -241,7 +241,7 @@
       "Define color palette: vibrant primaries, dark contrasts",
       "Default fonts: Montserrat/Poppins for headings, system for body"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-theming",
@@ -254,7 +254,7 @@
       "Define color palette: professional blues, warm accents",
       "Default fonts: Georgia/Merriweather for elegant feel"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "directory-theming",
@@ -269,7 +269,7 @@
       "Add custom CSS textarea for advanced users",
       "Save and invalidate Redis cache on theme change"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "shared-ui",
@@ -282,7 +282,7 @@
       "Create DataTable component for HQ lists",
       "Export all components from packages/ui"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "inngest",
@@ -295,7 +295,7 @@
       "Create 'entry.published' event for future integrations",
       "Setup Inngest dashboard for monitoring"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "deployment",
@@ -309,7 +309,7 @@
       "Document VPS deployment with Docker",
       "Create environment variables documentation"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "documentation",
@@ -323,7 +323,7 @@
       "Document custom domain setup",
       "Create troubleshooting guide"
     ],
-    "passes": false
+    "passes": true
   },
   {
     "category": "testing",

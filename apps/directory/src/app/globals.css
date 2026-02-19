@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme CSS variables — injected by ThemeProvider */
+:root {
+  --theme-primary: #3b82f6;
+  --theme-secondary: #6b7280;
+  --theme-accent: #f59e0b;
+  --theme-background: #ffffff;
+  --theme-foreground: #111827;
+  --theme-font-body: "Inter", sans-serif;
+  --theme-font-heading: "Inter", sans-serif;
+  --theme-radius: 0.5rem;
+}
