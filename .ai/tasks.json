@@ -1,0 +1,343 @@
+[
+  {
+    "category": "setup",
+    "description": "Initialize monorepo with Turborepo",
+    "steps": [
+      "Run pnpm dlx create-turbo@latest",
+      "Configure turbo.json with build, dev, lint pipelines",
+      "Setup workspace structure: apps/hq, apps/directory, packages/*",
+      "Configure shared tsconfig and eslint",
+      "Add .env.example files for both apps"
+    ],
+    "passes": false
+  },
+  {
+    "category": "setup",
+    "description": "Setup shared packages",
+    "steps": [
+      "Create packages/db for InstantDB schema and client",
+      "Create packages/cache for Upstash Redis helpers",
+      "Create packages/shared for types, utils, validation (Zod)",
+      "Configure package.json exports for each package",
+      "Verify packages are importable from apps"
+    ],
+    "passes": false
+  },
+  {
+    "category": "database",
+    "description": "Define InstantDB schema",
+    "steps": [
+      "Create InstantDB app in dashboard",
+      "Define 'owners' entity (id, email, name, createdAt)",
+      "Define 'projects' entity (id, ownerId, name, slug, domain, settings, createdAt)",
+      "Define 'entries' entity (id, projectId, title, slug, content, status, metadata, createdAt, publishedAt)",
+      "Define 'submissions' entity (id, projectId, data, status, createdAt)",
+      "Setup relations: owner hasMany projects, project hasMany entries/submissions",
+      "Export typed client from packages/db"
+    ],
+    "passes": false
+  },
+  {
+    "category": "database",
+    "description": "Setup Upstash Redis cache layer",
+    "steps": [
+      "Create Upstash Redis database",
+      "Install @upstash/redis in packages/cache",
+      "Create cache key helpers: getProjectKey, getEntriesKey, getEntryKey",
+      "Create cache read functions: getCachedEntries, getCachedEntry",
+      "Create cache write functions: setCachedEntries, invalidateProjectCache",
+      "Add TTL configuration (e.g., 1 hour default)",
+      "Export all helpers from packages/cache"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-auth",
+    "description": "HQ authentication with InstantDB",
+    "steps": [
+      "Configure InstantDB Auth providers (GitHub, Google)",
+      "Create auth middleware for HQ routes",
+      "Build login page with provider buttons",
+      "Build logout functionality",
+      "Create useCurrentUser hook",
+      "Protect all /dashboard/* routes"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-dashboard",
+    "description": "HQ dashboard overview page",
+    "steps": [
+      "Create /dashboard route",
+      "Display list of owner's projects with stats",
+      "Show total entries count per project",
+      "Show pending submissions count per project",
+      "Add quick actions: view project, manage entries",
+      "Add 'Create new project' CTA button"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-projects",
+    "description": "HQ project management CRUD",
+    "steps": [
+      "Create /dashboard/projects route - list all projects",
+      "Create /dashboard/projects/new route - create project form",
+      "Implement project creation with name, slug, domain fields",
+      "Create /dashboard/projects/[id] route - project detail/edit",
+      "Implement project update functionality",
+      "Implement project delete with confirmation",
+      "Add domain validation (unique per owner)"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-entries",
+    "description": "HQ entries management",
+    "steps": [
+      "Create /dashboard/projects/[id]/entries route - list entries",
+      "Implement entries table with sorting, filtering, pagination",
+      "Add status filter: draft, published, archived",
+      "Create /dashboard/projects/[id]/entries/new - create entry form",
+      "Create /dashboard/projects/[id]/entries/[entryId] - edit entry",
+      "Implement rich text editor for entry content",
+      "Add image upload via InstantDB Storage",
+      "Implement publish/unpublish toggle"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-entries",
+    "description": "HQ cache invalidation on entry changes",
+    "steps": [
+      "After entry create: update Redis cache for project",
+      "After entry update: update specific entry in Redis + entries list",
+      "After entry delete: remove from Redis + update entries list",
+      "After entry publish/unpublish: update Redis accordingly",
+      "Add Inngest job for async cache warming if needed"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-submissions",
+    "description": "HQ submissions review",
+    "steps": [
+      "Create /dashboard/projects/[id]/submissions route",
+      "Display submissions list with status: pending, approved, rejected",
+      "Create submission detail view with all submitted data",
+      "Add 'Approve' action - converts submission to draft entry",
+      "Add 'Reject' action with optional reason",
+      "Add bulk actions for multiple submissions",
+      "Setup Inngest job for email notification on new submission"
+    ],
+    "passes": false
+  },
+  {
+    "category": "hq-settings",
+    "description": "HQ project settings",
+    "steps": [
+      "Create /dashboard/projects/[id]/settings route",
+      "Add general settings: name, slug, domain",
+      "Add appearance settings: logo, colors, custom CSS",
+      "Add submission form settings: required fields, custom fields",
+      "Add SEO settings: default meta title, description template",
+      "Add integration settings: webhook URL for new submissions",
+      "Save settings to InstantDB and invalidate Redis"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-core",
+    "description": "Directory app setup and configuration",
+    "steps": [
+      "Create Next.js app in apps/directory",
+      "Setup environment variables: PROJECT_ID, UPSTASH_*, INSTANTDB_*",
+      "Create project config loader from env",
+      "Setup layout with project-specific metadata",
+      "Create getProject helper: Redis first, InstantDB fallback",
+      "Create getEntries helper: Redis first, InstantDB fallback"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-pages",
+    "description": "Directory public pages with SSR",
+    "steps": [
+      "Create / (home) route - entries list with SSR",
+      "Implement entries grid/list view",
+      "Add pagination or infinite scroll",
+      "Create /[slug] route - single entry page with SSR",
+      "Implement entry detail view with all metadata",
+      "Add related entries section",
+      "Generate proper meta tags for SEO",
+      "Create sitemap.xml generation",
+      "Create robots.txt"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-submission",
+    "description": "Directory submission form",
+    "steps": [
+      "Create /submit route",
+      "Build dynamic form based on project settings",
+      "Implement form validation with Zod",
+      "Add file upload for images/logos",
+      "Submit to InstantDB submissions collection",
+      "Trigger Inngest job for notification",
+      "Show success message with expectations",
+      "Add honeypot/captcha for spam prevention"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-seo",
+    "description": "Directory SEO optimization",
+    "steps": [
+      "Implement dynamic metadata for all pages",
+      "Add Open Graph tags for social sharing",
+      "Add Twitter Card meta tags",
+      "Implement JSON-LD structured data for entries",
+      "Create dynamic sitemap.xml with all published entries",
+      "Add canonical URLs",
+      "Verify SSR renders complete HTML for crawlers"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-theming",
+    "description": "Theming system architecture",
+    "steps": [
+      "Create theme configuration schema: colors, fonts, layout, spacing",
+      "Build ThemeProvider component with CSS variables injection",
+      "Create useTheme hook for accessing theme values",
+      "Add Google Fonts loader for custom typography",
+      "Implement theme selection in HQ project settings",
+      "Store selected template + overrides in project.settings.theme"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-theming",
+    "description": "Template: Minimal - clean and modern",
+    "steps": [
+      "Design Minimal template - whitespace focused, sans-serif",
+      "Create MinimalLayout component with simple header/footer",
+      "Create MinimalEntryCard - clean card with subtle shadows",
+      "Create MinimalEntryPage - focused reading experience",
+      "Define color palette: neutral grays, single accent color",
+      "Default fonts: Inter for body, optional serif for headings"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-theming",
+    "description": "Template: Bold - vibrant and eye-catching",
+    "steps": [
+      "Design Bold template - strong colors, prominent imagery",
+      "Create BoldLayout with colored header, gradient backgrounds",
+      "Create BoldEntryCard - large images, bold typography",
+      "Create BoldEntryPage - hero image, magazine-style layout",
+      "Define color palette: vibrant primaries, dark contrasts",
+      "Default fonts: Montserrat/Poppins for headings, system for body"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-theming",
+    "description": "Template: Classic - traditional directory style",
+    "steps": [
+      "Design Classic template - structured, information-dense",
+      "Create ClassicLayout with sidebar navigation, categories",
+      "Create ClassicEntryCard - list/table style with details",
+      "Create ClassicEntryPage - detailed info sections, specs table",
+      "Define color palette: professional blues, warm accents",
+      "Default fonts: Georgia/Merriweather for elegant feel"
+    ],
+    "passes": false
+  },
+  {
+    "category": "directory-theming",
+    "description": "Theme customization in HQ",
+    "steps": [
+      "Create theme preview component in HQ settings",
+      "Add template selector with live preview thumbnails",
+      "Build color picker for primary, secondary, accent, background",
+      "Add font selector with Google Fonts integration",
+      "Add spacing/border-radius controls",
+      "Add logo and favicon upload",
+      "Add custom CSS textarea for advanced users",
+      "Save and invalidate Redis cache on theme change"
+    ],
+    "passes": false
+  },
+  {
+    "category": "shared-ui",
+    "description": "Shared UI components (optional)",
+    "steps": [
+      "Setup packages/ui with Tailwind + Radix UI + shadcn",
+      "Create Button, Input, Select, Dialog components",
+      "Create Card component for entries",
+      "Create Form components with react-hook-form integration",
+      "Create DataTable component for HQ lists",
+      "Export all components from packages/ui"
+    ],
+    "passes": false
+  },
+  {
+    "category": "inngest",
+    "description": "Background jobs with Inngest",
+    "steps": [
+      "Setup Inngest in both apps",
+      "Create 'submission.received' event and handler",
+      "Implement email notification on new submission",
+      "Create 'cache.warm' event for cache warming",
+      "Create 'entry.published' event for future integrations",
+      "Setup Inngest dashboard for monitoring"
+    ],
+    "passes": false
+  },
+  {
+    "category": "deployment",
+    "description": "Deployment configuration",
+    "steps": [
+      "Create Dockerfile for HQ app",
+      "Create Dockerfile for Directory app",
+      "Create docker-compose.yml for local development",
+      "Document Vercel deployment for HQ",
+      "Document Vercel/Netlify deployment for Directory",
+      "Document VPS deployment with Docker",
+      "Create environment variables documentation"
+    ],
+    "passes": false
+  },
+  {
+    "category": "documentation",
+    "description": "User documentation for buyers",
+    "steps": [
+      "Write README.md with project overview",
+      "Document HQ installation and setup",
+      "Document Directory deployment options",
+      "Document environment variables",
+      "Document how to connect Directory to HQ (PROJECT_ID)",
+      "Document custom domain setup",
+      "Create troubleshooting guide"
+    ],
+    "passes": false
+  },
+  {
+    "category": "testing",
+    "description": "End-to-end testing",
+    "steps": [
+      "Setup Playwright for e2e tests",
+      "Test HQ login flow",
+      "Test project creation in HQ",
+      "Test entry CRUD in HQ",
+      "Test cache invalidation after entry update",
+      "Test Directory entries list loads from cache",
+      "Test Directory entry page SEO meta tags",
+      "Test submission form flow"
+    ],
+    "passes": false
+  }
+]
