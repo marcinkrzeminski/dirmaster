@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  hq:
+    build:
+      context: .
+      dockerfile: apps/hq/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - apps/hq/.env
+    restart: unless-stopped
+
+  directory:
+    build:
+      context: .
+      dockerfile: apps/directory/Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - apps/directory/.env
+    restart: unless-stopped
