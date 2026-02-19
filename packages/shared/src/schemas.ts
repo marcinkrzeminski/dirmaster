@@ -20,17 +20,12 @@ export const createEntrySchema = z.object({
     .max(200)
     .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
   content: z.string().default(""),
-  status: z.enum(["draft", "published", "archived"]).default("draft"),
+  status: z.enum(["draft", "published", "archived", "pending", "rejected"]).default("draft"),
   metadata: z.record(z.unknown()).default({}),
   imageUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export const updateEntrySchema = createEntrySchema.partial();
-
-export const submissionSchema = z.object({
-  projectId: z.string().min(1),
-  data: z.record(z.unknown()),
-});
 
 export const themeConfigSchema = z.object({
   template: z.enum(["minimal", "bold", "classic"]).default("minimal"),
@@ -82,6 +77,5 @@ export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type CreateEntryInput = z.infer<typeof createEntrySchema>;
 export type UpdateEntryInput = z.infer<typeof updateEntrySchema>;
-export type SubmissionInput = z.infer<typeof submissionSchema>;
 export type ThemeConfigInput = z.infer<typeof themeConfigSchema>;
 export type ProjectSettingsInput = z.infer<typeof projectSettingsSchema>;

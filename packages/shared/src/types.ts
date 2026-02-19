@@ -1,5 +1,4 @@
-export type EntryStatus = "draft" | "published" | "archived";
-export type SubmissionStatus = "pending" | "approved" | "rejected";
+export type EntryStatus = "draft" | "published" | "archived" | "pending" | "rejected";
 
 export interface Owner {
   id: string;
@@ -73,15 +72,7 @@ export interface Entry {
   status: EntryStatus;
   metadata: Record<string, unknown>;
   imageUrl?: string;
-  createdAt: number;
-  publishedAt?: number;
-}
-
-export interface Submission {
-  id: string;
-  projectId: string;
-  data: Record<string, unknown>;
-  status: SubmissionStatus;
   rejectionReason?: string;
   createdAt: number;
+  publishedAt?: number;
 }

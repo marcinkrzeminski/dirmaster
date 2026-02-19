@@ -26,18 +26,12 @@ const schema = i.schema({
       title: i.string(),
       slug: i.string().indexed(),
       content: i.string(),
-      status: i.string().indexed(), // "draft" | "published" | "archived"
+      status: i.string().indexed(), // "draft" | "published" | "archived" | "pending" | "rejected"
       metadata: i.json().optional(),
       imageUrl: i.string().optional(),
-      createdAt: i.number().indexed(),
-      publishedAt: i.number().optional(),
-    }),
-    submissions: i.entity({
-      projectId: i.string().indexed(),
-      data: i.json(),
-      status: i.string().indexed(), // "pending" | "approved" | "rejected"
       rejectionReason: i.string().optional(),
       createdAt: i.number().indexed(),
+      publishedAt: i.number().optional(),
     }),
   },
   links: {
@@ -48,10 +42,6 @@ const schema = i.schema({
     entryProject: {
       forward: { on: "entries", has: "one", label: "project" },
       reverse: { on: "projects", has: "many", label: "entries" },
-    },
-    submissionProject: {
-      forward: { on: "submissions", has: "one", label: "project" },
-      reverse: { on: "projects", has: "many", label: "submissions" },
     },
   },
 });
