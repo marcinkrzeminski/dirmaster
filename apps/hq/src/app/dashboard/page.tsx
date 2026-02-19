@@ -2,24 +2,16 @@
 
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from "ui";
 import { Plus, FolderOpen, FileText, Inbox } from "lucide-react";
 
 export default function DashboardPage() {
-  const { user } = useCurrentUser();
-
-  const { data, isLoading } = db.useQuery(
-    user
-      ? {
-          projects: {
-            $: { where: { ownerId: user.id } },
-            entries: {},
-            submissions: {},
-          },
-        }
-      : null
-  );
+  // AUTH DISABLED: load all projects without user filter
+  const { data, isLoading } = db.useQuery({
+    projects: {
+      entries: {},
+    },
+  });
 
   if (isLoading) {
     return (
@@ -65,9 +57,12 @@ export default function DashboardPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => {
-            const entriesCount = project.entries?.length ?? 0;
-            const pendingSubmissions =
-              project.submissions?.filter((s: { status: unknown }) => s.status === "pending").length ?? 0;
+            const entriesCount = (project.entries ?? []).filter(
+              (e: { status: unknown }) => e.status !== "pending" && e.status !== "rejected"
+            ).length;
+            const pendingSubmissions = (project.entries ?? []).filter(
+              (e: { status: unknown }) => e.status === "pending"
+            ).length;
 
             return (
               <Card key={project.id} className="hover:border-primary/50 transition-colors">
@@ -96,8 +91,8 @@ export default function DashboardPage() {
                       <Link href={`/dashboard/projects/${project.id}/entries`}>Entries</Link>
                     </Button>
                     <Button variant="outline" size="sm" asChild className="flex-1">
-                      <Link href={`/dashboard/projects/${project.id}/submissions`}>
-                        Submissions
+                      <Link href={`/dashboard/projects/${project.id}/entries?status=pending`}>
+                        Review
                       </Link>
                     </Button>
                   </div>

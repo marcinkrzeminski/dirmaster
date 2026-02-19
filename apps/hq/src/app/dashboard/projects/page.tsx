@@ -2,24 +2,16 @@
 
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Card, CardContent, Button, Badge } from "ui";
 import { Plus, Settings, FileText, Inbox, ExternalLink } from "lucide-react";
 
 export default function ProjectsPage() {
-  const { user } = useCurrentUser();
-
-  const { data, isLoading } = db.useQuery(
-    user
-      ? {
-          projects: {
-            $: { where: { ownerId: user.id } },
-            entries: {},
-            submissions: {},
-          },
-        }
-      : null
-  );
+  // AUTH DISABLED: load all projects without user filter
+  const { data, isLoading } = db.useQuery({
+    projects: {
+      entries: {},
+    },
+  });
 
   if (isLoading) {
     return (
@@ -58,9 +50,12 @@ export default function ProjectsPage() {
       ) : (
         <div className="space-y-3">
           {projects.map((project) => {
-            const entriesCount = project.entries?.length ?? 0;
-            const pendingSubmissions =
-              project.submissions?.filter((s) => s.status === "pending").length ?? 0;
+            const entriesCount = (project.entries ?? []).filter(
+              (e) => e.status !== "pending" && e.status !== "rejected"
+            ).length;
+            const pendingSubmissions = (project.entries ?? []).filter(
+              (e) => e.status === "pending"
+            ).length;
 
             return (
               <Card key={project.id}>
@@ -95,8 +90,8 @@ export default function ProjectsPage() {
                       <Link href={`/dashboard/projects/${project.id}/entries`}>Entries</Link>
                     </Button>
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/dashboard/projects/${project.id}/submissions`}>
-                        Submissions
+                      <Link href={`/dashboard/projects/${project.id}/entries?status=pending`}>
+                        Review
                       </Link>
                     </Button>
                     <Button variant="outline" size="sm" asChild>
