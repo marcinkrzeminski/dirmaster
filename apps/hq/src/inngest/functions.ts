@@ -18,15 +18,15 @@ export const onEntryPublished = inngest.createFunction(
 );
 
 /**
- * Notification: triggered when a new submission is received.
+ * Notification: triggered when a new entry is submitted via public form.
  */
-export const onSubmissionReceived = inngest.createFunction(
-  { id: "on-submission-received", name: "On Submission Received" },
-  { event: "submission/received" },
+export const onEntryReceived = inngest.createFunction(
+  { id: "on-entry-received", name: "On Entry Received" },
+  { event: "entry/received" },
   async ({ event }) => {
-    const { projectId, submissionId, data } = event.data as {
+    const { projectId, entryId, data } = event.data as {
       projectId: string;
-      submissionId: string;
+      entryId: string;
       data: Record<string, unknown>;
     };
 
@@ -42,10 +42,10 @@ export const onSubmissionReceived = inngest.createFunction(
       },
       body: JSON.stringify({
         to: process.env.NOTIFICATION_EMAIL,
-        subject: `New submission for project ${projectId}`,
+        subject: `New pending entry for project ${projectId}`,
         body: `
-          <h2>New submission received</h2>
-          <p>Submission ID: ${submissionId}</p>
+          <h2>New entry pending review</h2>
+          <p>Entry ID: ${entryId}</p>
           <pre>${JSON.stringify(data, null, 2)}</pre>
           <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard">Review in HQ</a></p>
         `,

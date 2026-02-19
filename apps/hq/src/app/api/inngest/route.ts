@@ -1,8 +1,8 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/inngest/client";
-import { onEntryPublished, onSubmissionReceived } from "@/inngest/functions";
+import { onEntryPublished, onEntryReceived } from "@/inngest/functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [onEntryPublished, onSubmissionReceived],
+  functions: [onEntryPublished, onEntryReceived],
 });
