@@ -29,9 +29,10 @@ export function middleware(request: NextRequest) {
     request.cookies.get("__session")?.value ||
     request.cookies.get("instant_token")?.value;
 
-  if (!token && pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // AUTH DISABLED
+  // if (!token && pathname.startsWith("/dashboard")) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 
   return NextResponse.next();
 }
