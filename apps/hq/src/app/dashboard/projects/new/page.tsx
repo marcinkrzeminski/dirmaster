@@ -36,7 +36,8 @@ export default function NewProjectPage() {
   }
 
   async function onSubmit(data: CreateProjectInput) {
-    if (!user) return;
+    // AUTH DISABLED: use placeholder ownerId
+    const ownerId = user?.id ?? "dev-user";
     setIsSubmitting(true);
     setError(null);
 
@@ -44,7 +45,7 @@ export default function NewProjectPage() {
       const projectId = id();
       await db.transact([
         db.tx.projects[projectId].update({
-          ownerId: user.id,
+          ownerId,
           name: data.name,
           slug: data.slug,
           domain: data.domain || undefined,
