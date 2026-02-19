@@ -159,6 +159,30 @@ export default function ProjectSettingsPage({
         </TabsList>
 
         <TabsContent value="general">
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Project ID</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-2 text-sm text-muted-foreground">
+                Use this as <code className="rounded bg-muted px-1">NEXT_PUBLIC_PROJECT_ID</code> in your directory app.
+              </p>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 rounded-md border bg-muted px-3 py-2 text-sm font-mono">
+                  {projectId}
+                </code>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigator.clipboard.writeText(projectId)}
+                >
+                  Copy
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>General settings</CardTitle>
